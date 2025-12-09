@@ -19,11 +19,11 @@ matplotlib.use("Agg") # set backend / disables ui opening
 #plt.rcParams["font.sans-serif"] = ["Helvetica"]
 #plt.rcParams["font.style"] = "oblique"
 #plt.style.use("dark_background")
-#plt.rc("font", weight="bold", size=8)
+plt.rc("font", weight="bold", size=10)
 
 def project(ticker, forward=90):
     stock = yf.Ticker(ticker)
-    history = stock.history(period="1mo")
+    history = stock.history(interval="1wk")
     
     if history.empty:
         return None
@@ -32,7 +32,7 @@ def project(ticker, forward=90):
     lastDate = history.index[-1]
     
     # IV calulcations
-    quantiles = np.linspace(0.05, 0.95, 19) # 19 layers for gradient
+    quantiles = np.linspace(0.05, 0.95, 19) # 19 divison
     
     # [days forward, [prices at quartiles]]
     anchorsX = [0]
@@ -116,25 +116,27 @@ def project(ticker, forward=90):
     # labels
     ax = plt.gca()
     ax.set_facecolor(bg)
-    ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
-    ax.tick_params(axis="x", labelsize=8, rotation=90, colors="gray")
+    ax.tick_params(axis="x", rotation=90, colors="gray")
     #plt.setp(ax.get_xticklabels(), weight="bold")
 
-    ax.yaxis.set_major_locator(LinearLocator(numticks=40))
+    ax.yaxis.set_major_locator(LinearLocator(numticks=30))
     ax.yaxis.set_major_formatter(FormatStrFormatter("$%.2f"))
-    ax.tick_params(axis="y", labelsize=8, colors="gray")
+    ax.tick_params(axis="y", colors="gray")
     #plt.setp(ax.get_yticklabels(), weight="bold")
 
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
     ax.tick_params(colors='gray', which='both')
-    ax.text(futureDates[-1], median[-1], f" ${median[-1]:.2f}", color=colour, fontweight='bold', fontsize=10, va='center', ha='left')
+    #ax.text(futureDates[-1], median[-1], f" ${median[-1]:.2f}", color=colour, fontweight='bold', fontsize=11, va='center', ha='left')
+    bbox = dict(boxstyle="square,pad=0.3", fc=bg, ec="none", alpha=1.0)
+    ax.annotate(f"${median[-1]:.2f}", xy=(1, median[-1]), xycoords=('axes fraction', 'data'), xytext=(5, 0), textcoords='offset points', va='center', ha='left', color=colour, fontweight='bold', fontsize=11, bbox=bbox,)
 
     ax.spines["top"].set_visible(False)
     ax.spines["left"].set_visible(False)
-    ax.spines['right'].set_color("white")
-    ax.spines['bottom'].set_color("white")
+    ax.spines['right'].set_color("gray")
+    ax.spines['bottom'].set_color("gray")
     
     # grid
     ax.grid(True, which="major", axis="y", linestyle="--", alpha=0.5)
