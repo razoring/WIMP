@@ -11,7 +11,7 @@ from scipy.stats import norm
 from datetime import datetime, timedelta
 
 matplotlib.use('Agg') # set backend / disables ui opening
-matplotlib.rcParams['font.family'] = 'monospace' # set font
+matplotlib.rcParams['font.family'] = 'monospace' # set globalfont
 
 def project(ticker, forward=90):
     stock = yf.Ticker(ticker)
