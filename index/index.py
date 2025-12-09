@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import os
 import typing
-from projections import project
+from projections_test import project
 from dotenv import load_dotenv
 
 from themes import brand, bgDark
@@ -30,7 +30,7 @@ async def help(interaction: discord.Interaction):
     app_commands.Choice(name="60 days", value="60"),
     app_commands.Choice(name="90 days", value="90")])
 @app_commands.choices(model=[
-    app_commands.Choice(name="Implied Volatility (≤3s)", value="0"),
+    app_commands.Choice(name="Implied Volatility (≤10s)", value="0"),
     app_commands.Choice(name="Extrapolation (≤2m)", value="1"),
     app_commands.Choice(name="Detailed Extrapolation (≤3m)", value="2"),
     app_commands.Choice(name="Reasoning AI Analysis [UNAVAILABLE] (≤5m)", value="3")])
@@ -38,7 +38,7 @@ async def predict(interaction: discord.Interaction, ticker: str, duration: typin
     await interaction.response.defer()
 
     embed = discord.Embed(color=discord.Colour.teal())
-    embed.set_footer(text="Disclaimer: Projections are not guarantees of future price movements and may differ from actual performance. Trade responsibly. Not financial advice.")
+    embed.set_footer(text=f"{interaction.user.mention}")
 
     try:
         image_buffer = project(ticker, duration.value if duration != None else 90, model.value if model != None else 0)

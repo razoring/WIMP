@@ -27,11 +27,10 @@ plt.rc("font", weight="bold", size=10)
 
 def project(ticker, forward=90, model=0):
     stock = yf.Ticker(ticker)
-    history = stock.history(interval="1wk")
+    history = stock.history(interval="1wk") if model == 0 else stock.history(period="2y")
     
     if history.empty:
         return None
-
     curPrice = history["Close"].iloc[-1]
     lastDate = history.index[-1]
     
@@ -148,7 +147,7 @@ def project(ticker, forward=90, model=0):
     plt.ylim(minY * 0.98, maxY * 1.02)
     
     # combine both line and fan graphs
-    dates = list(history.index) + futureDates
+    dates = list(history[history.index > lastDate - timedelta(days=7)].index) + futureDates
     plt.xlim(dates[0], dates[-1])
 
     plt.tight_layout()
