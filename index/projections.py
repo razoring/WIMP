@@ -106,8 +106,6 @@ def project(ticker, forward=90):
     ax.plot(future_dates, median, color='#0055ff', linewidth=2)
 
     # labels
-    plt.title(f"{ticker} Projection ({forward} Days)", loc='left', fontsize=14, fontweight='bold')
-
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     plt.xticks(rotation=90,fontsize=8)
