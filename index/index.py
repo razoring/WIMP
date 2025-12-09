@@ -23,13 +23,13 @@ async def status(interaction: discord.Interaction):
 @bot.tree.command(name="predict", description="Predicts future movements of a given ticker")
 @app_commands.describe(ticker="The ticker symbol to predict (ex. AAPL, MSFT, GOOG)", duration="How many days to predict")
 @app_commands.choices(duration=[
-    app_commands.Choice(name="1 month", value=30),
-    app_commands.Choice(name="2 months", value=60),
-    app_commands.Choice(name="3 months", value=90)])
-async def predict(interaction: discord.Interaction, ticker: str, duration: app_commands.Choice[int]):
+    app_commands.Choice(name="1 month", value="30"),
+    app_commands.Choice(name="2 months", value="60"),
+    app_commands.Choice(name="3 months", value="90")])
+async def predict(interaction: discord.Interaction, ticker: str, duration: app_commands.Choice[str]):
     try:
         await interaction.response.defer()
-        image_buffer = project(ticker, duration)
+        image_buffer = project(ticker, int(duration))
         file = discord.File(image_buffer, filename="output.png")
         embed = discord.Embed()
         embed.set_image(url="attachment://output.png")
