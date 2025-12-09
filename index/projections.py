@@ -71,8 +71,7 @@ def project(ticker, forward=90, model=0):
             for q in quantiles:
                 z = norm.ppf(q)
                 # geometric brownian motion calculation
-                if model == 0:
-                    projection = curPrice*np.exp(-3*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
+                projection = curPrice*np.exp(-1*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
                 expPrices.append(projection)
             
             anchorsX.append(expDays)

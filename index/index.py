@@ -30,9 +30,10 @@ async def help(interaction: discord.Interaction):
     app_commands.Choice(name="60 days", value="60"),
     app_commands.Choice(name="90 days", value="90")])
 @app_commands.choices(model=[
-    app_commands.Choice(name="Options Volatility (≤3s)", value="0"),
-    app_commands.Choice(name="Algorithmic Analysis (≤2m)", value="1"),
-    app_commands.Choice(name="Reasoning AI Analysis [UNAVAILABLE] (≤5m)", value="2")])
+    app_commands.Choice(name="Implied Volatility (≤3s)", value="0"),
+    app_commands.Choice(name="Extrapolation (≤2m)", value="1"),
+    app_commands.Choice(name="Detailed Extrapolation (≤3m)", value="2"),
+    app_commands.Choice(name="Reasoning AI Analysis [UNAVAILABLE] (≤5m)", value="3")])
 async def predict(interaction: discord.Interaction, ticker: str, duration: typing.Optional[app_commands.Choice[str]], model: typing.Optional[app_commands.Choice[str]]):
     await interaction.response.defer()
 
