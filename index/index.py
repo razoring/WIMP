@@ -29,7 +29,7 @@ async def status(interaction: discord.Interaction):
 async def predict(interaction: discord.Interaction, ticker: str, duration: app_commands.Choice[str]):
     try:
         await interaction.response.defer()
-        image_buffer = project(ticker, int(duration))
+        image_buffer = project(ticker, int(duration.value))
         file = discord.File(image_buffer, filename="output.png")
         embed = discord.Embed()
         embed.set_image(url="attachment://output.png")
