@@ -1,17 +1,21 @@
 import io
+import numpy as np
+import pandas as pd
+import yfinance as yf
+
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import numpy as np
-import pandas as pd
-import yfinance as yf
+
 from scipy.interpolate import CubicSpline
 from scipy.stats import norm
 from datetime import datetime, timedelta
 
-colour = "#13f7c9"
-bg = "#0a131b"
+import prophet as ph
+
+from themes import brand, bgDark
+
 
 matplotlib.use("Agg") # set backend / disables ui opening
 #matplotlib.rc("font", family="Courier New")
@@ -21,7 +25,7 @@ matplotlib.use("Agg") # set backend / disables ui opening
 #plt.style.use("dark_background")
 plt.rc("font", weight="bold", size=10)
 
-def project(ticker, forward=90):
+def project(ticker, forward=90, model=0):
     stock = yf.Ticker(ticker)
     history = stock.history(interval="1wk")
     
@@ -67,7 +71,8 @@ def project(ticker, forward=90):
             for q in quantiles:
                 z = norm.ppf(q)
                 # geometric brownian motion calculation
-                projection = curPrice*np.exp(-3*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
+                if model == 0:
+                    projection = curPrice*np.exp(-3*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
                 expPrices.append(projection)
             
             anchorsX.append(expDays)
@@ -96,26 +101,26 @@ def project(ticker, forward=90):
 
     # plot the graph
     fig, ax = plt.subplots(figsize=(20, 10), dpi=120)
-    fig.patch.set_facecolor(color=bg)
-    ax.plot(history.index, history["Close"], color=colour, linewidth=2, zorder=10)
+    fig.patch.set_facecolor(color=bgDark)
+    ax.plot(history.index, history["Close"], color=brand, linewidth=2, zorder=10)
     minY = min(history["Close"].min(), np.min(smoothing))
     maxY = max(history["Close"].max(), np.max(smoothing))
-    ax.fill_between(history.index, minY * 0.90, history["Close"], color=colour, alpha=0.2)
+    ax.fill_between(history.index, minY * 0.90, history["Close"], color=brand, alpha=0.2)
     
     # start fan graph
     mid = len(quantiles) // 2
     for i in range(mid):
         lower_curve = smoothing[i]
         upper_curve = smoothing[-(i+1)]
-        ax.fill_between(futureDates, lower_curve, upper_curve, color=colour, alpha=0.15, lw=0)
+        ax.fill_between(futureDates, lower_curve, upper_curve, color=brand, alpha=0.15, lw=0)
 
     # 50% line
     median = smoothing[mid]
-    ax.plot(futureDates, median, color=colour, linewidth=2)
+    ax.plot(futureDates, median, color=brand, linewidth=2)
 
     # labels
     ax = plt.gca()
-    ax.set_facecolor(bg)
+    ax.set_facecolor(bgDark)
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
     ax.tick_params(axis="x", rotation=90, colors="gray")
@@ -130,8 +135,8 @@ def project(ticker, forward=90):
     ax.yaxis.set_label_position("right")
     ax.tick_params(colors='gray', which='both')
     #ax.text(futureDates[-1], median[-1], f" ${median[-1]:.2f}", color=colour, fontweight='bold', fontsize=11, va='center', ha='left')
-    bbox = dict(boxstyle="square,pad=0.3", fc=bg, ec="none", alpha=1.0)
-    ax.annotate(f"${median[-1]:.2f}", xy=(1, median[-1]), xycoords=('axes fraction', 'data'), xytext=(5, 0), textcoords='offset points', va='center', ha='left', color=colour, fontweight='bold', fontsize=11, bbox=bbox,)
+    bbox = dict(boxstyle="square,pad=0.3", fc=bgDark, ec="none", alpha=1.0)
+    ax.annotate(f"${median[-1]:.2f}", xy=(1, median[-1]), xycoords=('axes fraction', 'data'), xytext=(5, 0), textcoords='offset points', va='center', ha='left', color=brand, fontweight='bold', fontsize=11, bbox=bbox,)
 
     ax.spines["top"].set_visible(False)
     ax.spines["left"].set_visible(False)
