@@ -1,2 +1,5 @@
 python-dotenv
 discord
+yfinance
+matplotlib
+scipy
