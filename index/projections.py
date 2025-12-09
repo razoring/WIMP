@@ -81,10 +81,10 @@ def ivSmoothing(stock, lastDate, forward, curPrice, quantiles, futureDays):
         smoothing.append(cs(futureDays))
     return np.array(smoothing)
 
-def project(ticker, forward=90, model=0):
-    """
-    >>> project("AMD", 90, 0)
-    """
+def project(ticker, forward, model):
+    # typecasting (caused all the model errors)
+    model = int(model) if type(model) == str else model
+    forward = int(forward) if type(model) == str else forward
 
     stock = yf.Ticker(ticker)
     history = stock.history(interval="1wk") if model == 0 else stock.history(period="2y")
@@ -101,6 +101,8 @@ def project(ticker, forward=90, model=0):
     
     # IV calulcations
     smoothing = []
+
+    print(model, type(model))
     if model != 1: # not model prophet
         smoothing = ivSmoothing(stock=stock,lastDate=lastDate,forward=forward,curPrice=curPrice,quantiles=quantiles, futureDays=futureDays)
     
