@@ -35,14 +35,14 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
     await interaction.response.defer()
 
     embed = discord.Embed(color=discord.Colour.teal())
-    embed.set_footer(text=f"{interaction.user.mention}")
+    #embed.set_footer(text=f"{interaction.user.mention}")
 
     try:
         image_buffer = project(ticker, model.value if model != None else 2)
         if image_buffer:
             file = discord.File(image_buffer, filename="output.png")
             embed.set_image(url="attachment://output.png")
-            await interaction.followup.send(file=file, embed=embed)
+            await interaction.followup.send(f"{interaction.user.mention}",file=file, embed=embed)
         else:
             await interaction.followup.send("```ERROR: Please check you entered the ticker symbol correct.```")
     except Exception as e:
