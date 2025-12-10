@@ -40,7 +40,7 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
     #embed.set_footer(text=f"{interaction.user.mention}")
 
     try:
-        selectedModel = int(model.value) if model.value is None else 2
+        selectedModel = int(model.value) if model is None else 2
         image_buffer = project(ticker, selectedModel)
         if image_buffer:
             file = discord.File(image_buffer, filename="output.png")
