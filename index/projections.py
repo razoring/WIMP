@@ -164,7 +164,7 @@ def project(ticker, forward, model):
     ax.add_patch(poly)
     cTop = to_rgba(brand, alpha=0.3)
     cBot = to_rgba(brand, alpha=0.0)
-    gradientCmap = LinearSegmentedColormap.from_list('history_gradient', [cBot, cBot, cTop])
+    gradientCmap = LinearSegmentedColormap.from_list('history_gradient', [cBot, cTop])
     gradient = np.linspace(0, 1, 256).reshape(-1, 1)
     im = ax.imshow(gradient, aspect='auto', cmap=gradientCmap, origin='lower', extent=[xNums[0], xNums[-1], yFloor, yVals.max()], zorder=1)
     im.set_clip_path(poly)
