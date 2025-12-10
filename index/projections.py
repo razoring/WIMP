@@ -187,7 +187,7 @@ def project(ticker, model):
 
     # legend
     legend_elements = [Line2D([0], [0], color=brand, lw=2, label='50% Probability')]
-    for i in range(0, mid, 2): 
+    for i in range(0, mid, 1): 
         q = quantiles[i]
         ci = int(round(50-((1 - 2*q) * 50)))
         simulated_alpha = 1 - (1 - 0.15) ** (i + 1)
