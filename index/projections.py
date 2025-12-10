@@ -24,6 +24,8 @@ from prophet import Prophet as ph
 from themes import brand, bgDark
 # end of imports
 
+
+#TODO clean up this code
 matplotlib.use("Agg") # set backend / disables ui opening
 logging.getLogger('prophet').setLevel(logging.WARNING) # pre setup / disable logging
 logging.getLogger('cmdstanpy').disabled = True
