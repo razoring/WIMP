@@ -72,7 +72,7 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
         embed.add_field(name=f"Vol: {numSuffix(round(history['Volume'].max(),2))}", value=f"Beta: {numSuffix(round(symbol.info.get('beta', 0),2))}", inline=True)
         embed.add_field(name=f"52Wk High: ${round(year['High'].max(),2)}", value=f"52Wk Low: ${round(year['Low'].min(),2)}", inline=True)
         embed.add_field(name=f"P/E: ${round(info.get('trailingPE', 0),2)}", value=f"EPS: ${round(symbol.info.get('trailingEps'),2)}", inline=True)
-        embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {datetime.fromtimestamp(info.get('exDividendDate').date())}", inline=True)
+        embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {datetime.fromtimestamp(info.get('exDividendDate')).date()}", inline=True)
 
         await interaction.followup.send(f"Here is today's predictions ({models[int(selectedModel)]} Model) {interaction.user.mention}:",file=file, embed=embed)
     else:
