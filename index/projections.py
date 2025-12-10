@@ -11,6 +11,8 @@ import matplotlib.dates as mdates
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib.patches import Polygon
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 from scipy.interpolate import CubicSpline
 from scipy.stats import norm
@@ -27,7 +29,6 @@ matplotlib.use("Agg") # set backend / disables ui opening
 #plt.rcParams["font.sans-serif"] = ["Helvetica"]
 #plt.rcParams["font.style"] = "oblique"
 #plt.style.use("dark_background")
-plt.rc("font", weight="bold", size=10)
 
 def ivSmoothing(stock, lastDate, forward, curPrice, quantiles, futureDays):
     anchorsY = [[curPrice] * len(quantiles)] # [days forward, [prices at quartiles]]
@@ -83,11 +84,10 @@ def ivSmoothing(stock, lastDate, forward, curPrice, quantiles, futureDays):
         smoothing.append(cs(futureDays))
     return np.array(smoothing)
 
-def project(ticker, forward, model):
+def project(ticker, model):
     # typecasting (caused all the model errors)
     model = int(model) if type(model) == str else 0
-    forward = int(forward) if type(model) == str else 90
-    print(forward, type(forward))
+    forward = 90
 
     stock = yf.Ticker(ticker)
     history = stock.history(period="1mo") if model == 0 else stock.history(period="1y")
@@ -97,7 +97,7 @@ def project(ticker, forward, model):
     curPrice = history["Close"].iloc[-1]
     lastDate = history.index[-1]
     plotHistory = history[history.index > lastDate - timedelta(days=7)]
-    quantiles = np.linspace(0.05, 0.95, 19) # 19 divisons
+    quantiles = np.linspace(0.05, 0.95, 11) # 19 divisons
 
     futureDays = np.arange(0, forward + 1)
     futureDates = [lastDate + timedelta(days=int(d)) for d in futureDays]
@@ -152,6 +152,7 @@ def project(ticker, forward, model):
     # floor smoothing
     smoothing = np.maximum(smoothing, 0.01)
     # plot the graph
+    plt.rc("font", weight="bold", size=10)
     fig, ax = plt.subplots(figsize=(20, 10), dpi=120)
     fig.patch.set_facecolor(color=bgDark)
     ax.plot(plotHistory.index, plotHistory["Close"], color=brand, linewidth=2, zorder=10)
@@ -172,11 +173,34 @@ def project(ticker, forward, model):
     im = ax.imshow(gradient, aspect='auto', cmap=gradientCmap, origin='lower', extent=[xNums[0], xNums[-1], yFloor, yVals.max()], zorder=1)
     im.set_clip_path(poly)
     
+    # fan graph
     mid = len(quantiles) // 2
     for i in range(mid):
         lower_curve = smoothing[i]
         upper_curve = smoothing[-(i+1)]
         ax.fill_between(futureDates, lower_curve, upper_curve, color=brand, alpha=0.15, lw=0)
+
+    # legend
+    legend_elements = [Line2D([0], [0], color=brand, lw=2, label='50% Probability')]
+    for i in range(0, mid, 1): 
+        q = quantiles[i]
+        ci = int(round(50-((1 - 2*q) * 50)))
+        simulated_alpha = 1 - (1 - 0.15) ** (i + 1)
+        legend_elements.append(Patch(facecolor=brand, edgecolor=None, alpha=simulated_alpha, label=f'{ci}% Probability'))
+
+    leg = ax.legend(
+        handles=legend_elements,
+        loc='upper left',
+        facecolor=bgDark, #bg
+        edgecolor='gray',
+        framealpha=1.0,
+        fancybox=True, #rounded corners
+        labelcolor='white',
+        fontsize=8,
+        borderpad=0.8
+    )
+    # Set stroke width of the legend border
+    leg.get_frame().set_linewidth(1)
 
     # 50% line
     median = smoothing[mid] # make them start at the same spot
