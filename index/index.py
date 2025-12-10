@@ -30,7 +30,7 @@ models = ["Implied Volatility", "Extrapolation", "Aggregate-Extrapolation", "Log
 - Make a points system
 - Implement the AI
 - Implement the help system
-- Usage tracking
+- Telemetry data
 """
 
 @bot.event
