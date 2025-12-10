@@ -201,11 +201,7 @@ def project(ticker, model):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
     ax.tick_params(axis="x", rotation=90, colors="gray")
     #plt.setp(ax.get_xticklabels(), weight="bold")
-
-    leg = ax.legend( handles=legend_elements, loc='upper left', facecolor=bgDark, edgecolor='gray', framealpha=1.0, fancybox=True, labelcolor='white', fontsize=8, borderpad=0.8)
     leg.get_frame().set_linewidth(1)
-    ax.yaxis.set_major_formatter(FormatStrFormatter("$%.2f"))
-    ax.tick_params(axis="y", colors="gray")
     #plt.setp(ax.get_yticklabels(), weight="bold")
 
     # y ticks
