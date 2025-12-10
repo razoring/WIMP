@@ -11,6 +11,7 @@ def numSuffix(value, fraction_point=1):
     if value < 0:
         is_negative = True
         value = abs(value)
+    return_value = str(value)
     for i, p in enumerate(powers):
         if value >= p:
             return_value = str(round(value / (p / (10.0 ** fraction_point))) /
