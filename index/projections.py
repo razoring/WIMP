@@ -184,14 +184,13 @@ def project(ticker, model):
         ax.fill_between(futureDates, lower_curve, upper_curve, color=brand, alpha=0.15, lw=0)
 
     # legend
-    elements = []
+    elements = [Line2D([0], [0], color=brand, lw=2, label=("50% Probability" if model != 1 else "Prediction"), linestyle= ("dashed" if model == 1 else "solid"))]
     if model != 1:
         for i in range(0, mid, 1): 
             q = quantiles[i]
             ci = int(round(50-((1 - 2*q) * 50)))
             simulated_alpha = 1 - (1 - 0.15) ** (i + 1)
             elements.append(Patch(facecolor=brand, edgecolor=None, alpha=simulated_alpha, label=f'{ci}% Probability'))
-    elements.append(Line2D([0], [0], color=brand, lw=2, label=("50% Probability" if model != 1 else "Prediction"), linestyle= ("dashed" if model == 1 else "solid")))
     leg = ax.legend( handles=elements, loc='lower left', facecolor=bgDark, edgecolor='gray', framealpha=1.0, fancybox=True, labelcolor='white', fontsize=8, borderpad=0.8)
     leg.get_frame().set_linewidth(1)
 

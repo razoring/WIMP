@@ -45,37 +45,34 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
     #embed.set_footer(text=f"{interaction.user.mention}")
     selectedModel = int(model.value) if type(model) is not None else 2
 
-    try:
-        image_buffer = project(ticker, selectedModel)
-        if image_buffer:
-            file = discord.File(image_buffer, filename="output.png")
+    image_buffer = project(ticker, selectedModel)
+    if image_buffer:
+        file = discord.File(image_buffer, filename="output.png")
 
-            symbol = yf.Ticker(ticker)
-            history = symbol.history(period="1d")
-            year = symbol.history(period="1y")
-            info = symbol.info
+        symbol = yf.Ticker(ticker)
+        history = symbol.history(period="1d")
+        year = symbol.history(period="1y")
+        info = symbol.info
 
-            # yield courtesy of: https://www.khueapps.com/blog/article/how-to-fetch-stock-dividend-data-with-python
-            div = symbol.dividends
-            now = pd.Timestamp.utcnow().tz_localize(None)
-            year = now - pd.DateOffset(years=1)
-            lastClose = yf.Ticker(ticker).history(period="5d")["Close"].iloc[-1]
-            yearAgo = pd.Timestamp(yearAgo, tz=div.index.tz)
-            ttm_div = div[div.index >= yearAgo].sum()
-            yields = 100.0 * ttm_div / lastClose if lastClose > 0 else float("nan")
+        # yield courtesy of: https://www.khueapps.com/blog/article/how-to-fetch-stock-dividend-data-with-python
+        div = symbol.dividends
+        now = pd.Timestamp.utcnow().tz_localize(None)
+        year = now - pd.DateOffset(years=1)
+        lastClose = yf.Ticker(ticker).history(period="5d")["Close"].iloc[-1]
+        yearAgo = pd.Timestamp(yearAgo, tz=div.index.tz)
+        ttm_div = div[div.index >= yearAgo].sum()
+        yields = 100.0 * ttm_div / lastClose if lastClose > 0 else float("nan")
 
-            embed.set_image(url="attachment://output.png")
-            embed.add_field(name=f"High: ${round(history['High'].max(),2)}", value=f"Low: ${round(history['Low'].min(),2)}", inline=True)
-            embed.add_field(name=f"Open: ${round(history['Open'].max(),2)}", value=f"Close: ${round(history['Close'].max(),2)}", inline=True)
-            embed.add_field(name=f"Vol: {numSuffix(round(history['Volume'].max(),2))}", value=f"Beta: {numSuffix(round(symbol.info.get('beta', 0),2))}", inline=True)
-            embed.add_field(name=f"52Wk High: ${round(year['High'].max(),2)}", value=f"52Wk Low: ${round(year['Low'].min(),2)}", inline=True)
-            embed.add_field(name=f"P/E: ${round(info.get('trailingPE', 0),2)}", value=f"EPS: ${round(symbol.info.get('trailingEps'),2)}", inline=True)
-            embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {pd.to_datetime(info.get('exDividendDate'))}", inline=True)
+        embed.set_image(url="attachment://output.png")
+        embed.add_field(name=f"High: ${round(history['High'].max(),2)}", value=f"Low: ${round(history['Low'].min(),2)}", inline=True)
+        embed.add_field(name=f"Open: ${round(history['Open'].max(),2)}", value=f"Close: ${round(history['Close'].max(),2)}", inline=True)
+        embed.add_field(name=f"Vol: {numSuffix(round(history['Volume'].max(),2))}", value=f"Beta: {numSuffix(round(symbol.info.get('beta', 0),2))}", inline=True)
+        embed.add_field(name=f"52Wk High: ${round(year['High'].max(),2)}", value=f"52Wk Low: ${round(year['Low'].min(),2)}", inline=True)
+        embed.add_field(name=f"P/E: ${round(info.get('trailingPE', 0),2)}", value=f"EPS: ${round(symbol.info.get('trailingEps'),2)}", inline=True)
+        embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {pd.to_datetime(info.get('exDividendDate'))}", inline=True)
 
-            await interaction.followup.send(f"Here is today's predictions ({models[int(selectedModel)]} Model) {interaction.user.mention}:",file=file, embed=embed)
-        else:
-            await interaction.followup.send("```ERROR: Please check you entered the ticker symbol correct.```")
-    except Exception as e:
-        await interaction.followup.send(f"```UNCAUGHT ERROR: {e.with_traceback}```")
+        await interaction.followup.send(f"Here is today's predictions ({models[int(selectedModel)]} Model) {interaction.user.mention}:",file=file, embed=embed)
+    else:
+        await interaction.followup.send("```ERROR: Please check you entered the ticker symbol correct.```")
 
 bot.run(TOKEN)
