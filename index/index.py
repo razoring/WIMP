@@ -42,7 +42,7 @@ async def predict(interaction: discord.Interaction, ticker: str, duration: typin
     embed.set_footer(text=f"{interaction.user.mention}")
 
     try:
-        image_buffer = project(ticker, duration.value if duration != None else 90, model.value if model != None else 0)
+        image_buffer = project(ticker, duration.value if duration != None else 90, model.value if model != None else 2)
         if image_buffer:
             file = discord.File(image_buffer, filename="output.png")
             embed.set_image(url="attachment://output.png")

@@ -87,6 +87,7 @@ def project(ticker, forward, model):
     # typecasting (caused all the model errors)
     model = int(model) if type(model) == str else 0
     forward = int(forward) if type(model) == str else 90
+    print(forward, type(forward))
 
     stock = yf.Ticker(ticker)
     history = stock.history(period="1mo") if model == 0 else stock.history(period="1y")
@@ -147,7 +148,9 @@ def project(ticker, forward, model):
             for i in range(len(quantiles)):
                 combinedSmoothing.append(prophetTrend + spread[i])
             smoothing = np.array(combinedSmoothing)
-
+    
+    # floor smoothing
+    smoothing = np.maximum(smoothing, 0.01)
     # plot the graph
     fig, ax = plt.subplots(figsize=(20, 10), dpi=120)
     fig.patch.set_facecolor(color=bgDark)
