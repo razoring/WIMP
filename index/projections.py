@@ -1,4 +1,5 @@
 import io
+import logging
 import doctest
 
 import numpy as np
@@ -24,6 +25,8 @@ from themes import brand, bgDark
 # end of imports
 
 matplotlib.use("Agg") # set backend / disables ui opening
+logging.getLogger('prophet').setLevel(logging.WARNING) # pre setup / disable logging
+logging.getLogger('cmdstanpy').disabled = True
 #matplotlib.rc("font", family="Courier New")
 #plt.rcParams["font.family"] = "sans-serif"
 #plt.rcParams["font.sans-serif"] = ["Helvetica"]
