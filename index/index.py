@@ -43,7 +43,10 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
 
     embed = discord.Embed(color=discord.Colour.teal(), title=f"{ticker} (90 day prediction)")
     #embed.set_footer(text=f"{interaction.user.mention}")
-    selectedModel = int(model.value) if type(model) is not None else 2
+    if type(model) is not type(None):
+        selectedModel = int(model.value)
+    else:
+        selectedModel = 2
 
     image_buffer = project(ticker, selectedModel)
     if image_buffer:
@@ -69,7 +72,7 @@ async def predict(interaction: discord.Interaction, ticker: str, model: typing.O
         embed.add_field(name=f"Vol: {numSuffix(round(history['Volume'].max(),2))}", value=f"Beta: {numSuffix(round(symbol.info.get('beta', 0),2))}", inline=True)
         embed.add_field(name=f"52Wk High: ${round(year['High'].max(),2)}", value=f"52Wk Low: ${round(year['Low'].min(),2)}", inline=True)
         embed.add_field(name=f"P/E: ${round(info.get('trailingPE', 0),2)}", value=f"EPS: ${round(symbol.info.get('trailingEps'),2)}", inline=True)
-        embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {pd.to_datetime(info.get('exDividendDate'))}", inline=True)
+        embed.add_field(name=f"Yield: {round(yields,2)}%", value=f"Ex. Dividend: {datetime.fromtimestamp(info.get('exDividendDate'))}", inline=True)
 
         await interaction.followup.send(f"Here is today's predictions ({models[int(selectedModel)]} Model) {interaction.user.mention}:",file=file, embed=embed)
     else:
