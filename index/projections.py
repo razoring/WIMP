@@ -67,7 +67,7 @@ def ivSmoothing(options, stock, lastDate, forward, curPrice, quantiles, futureDa
             for q in quantiles:
                 z = norm.ppf(q)
                 # geometric brownian motion calculation
-                projection = curPrice*np.exp(-1*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
+                projection = curPrice*np.exp(-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z) #-0.5*mean**2 * tYears+mean * np.sqrt(tYears)*z
                 expPrices.append(projection)
             
             anchorsX.append(expDays)
@@ -93,7 +93,7 @@ def project(ticker, model):
     forward = 90
 
     stock = yf.Ticker(ticker)
-    history = stock.history(period="1mo") if model == 0 else stock.history(period="1y")
+    history = stock.history(period="1mo") if model == 0 else stock.history(period="3y")
     if history.empty:
         return None
     
