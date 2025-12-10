@@ -182,24 +182,12 @@ def project(ticker, model):
 
     # legend
     legend_elements = [Line2D([0], [0], color=brand, lw=2, label='50% Probability')]
-    for i in range(0, mid, 1): 
+    for i in range(0, mid, 2): 
         q = quantiles[i]
         ci = int(round(50-((1 - 2*q) * 50)))
         simulated_alpha = 1 - (1 - 0.15) ** (i + 1)
         legend_elements.append(Patch(facecolor=brand, edgecolor=None, alpha=simulated_alpha, label=f'{ci}% Probability'))
-
-    leg = ax.legend(
-        handles=legend_elements,
-        loc='upper left',
-        facecolor=bgDark, #bg
-        edgecolor='gray',
-        framealpha=1.0,
-        fancybox=True, #rounded corners
-        labelcolor='white',
-        fontsize=8,
-        borderpad=0.8
-    )
-    # Set stroke width of the legend border
+    leg = ax.legend( handles=legend_elements, loc='bottom left', facecolor=bgDark, edgecolor='gray', framealpha=1.0, fancybox=True, labelcolor='white', fontsize=8, borderpad=0.8)
     leg.get_frame().set_linewidth(1)
 
     # 50% line
@@ -214,7 +202,8 @@ def project(ticker, model):
     ax.tick_params(axis="x", rotation=90, colors="gray")
     #plt.setp(ax.get_xticklabels(), weight="bold")
 
-    ax.yaxis.set_major_locator(LinearLocator(numticks=30))
+    leg = ax.legend( handles=legend_elements, loc='upper left', facecolor=bgDark, edgecolor='gray', framealpha=1.0, fancybox=True, labelcolor='white', fontsize=8, borderpad=0.8)
+    leg.get_frame().set_linewidth(1)
     ax.yaxis.set_major_formatter(FormatStrFormatter("$%.2f"))
     ax.tick_params(axis="y", colors="gray")
     #plt.setp(ax.get_yticklabels(), weight="bold")
