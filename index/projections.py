@@ -93,40 +93,41 @@ def project(ticker, model):
     forward = 90
 
     stock = yf.Ticker(ticker)
-    history = stock.history(period="1mo") if model == 0 else stock.history(period="3y")
+    history = stock.history(period="1mo") if model == 0 else stock.history(period= "5y")
     if history.empty:
         return None
     
     curPrice = history["Close"].iloc[-1]
     lastDate = history.index[-1]
+    # give all the history in the last 7 days; > is a specifier; history[] is dates, history.index is list
     plotHistory = history[history.index > lastDate - timedelta(days=7)]
     quantiles = np.linspace(0.05, 0.95, 11) # 19 divisons
 
     futureDays = np.arange(0, forward + 1)
     futureDates = [lastDate + timedelta(days=int(d)) for d in futureDays]
     
-    smoothing = []
     # Prophet predictions
+    smoothing = []
+    prophetSum = []
     prophetTrend = None
-    prophetSigma = None
+    prophetSigma = 0
     if model != 0: # not model IV
-        prophetData = history.reset_index()[["Date", "Close"]]
-        prophetData.columns = ["ds", "y"]
-        prophetData["ds"] = prophetData["ds"].dt.tz_localize(None)
+        histories = {365:0.5, 730:0.15, 1095:0.15, 1825:0.2} #years in days: weight
+        #histories = {365:1}
+        for h in histories:
+            data = history[history.index > lastDate - timedelta(days=h)].reset_index()[["Date", "Close"]]
+            data.columns = ["ds", "y"]
+            data["ds"] = data["ds"].dt.tz_localize(None)
 
-        mProphet = ph(daily_seasonality=True, yearly_seasonality=True)
-        mProphet.fit(prophetData)
+            prophet = ph(daily_seasonality=True, yearly_seasonality=True)
+            prophet.fit(data)
 
-        futureProphet = mProphet.make_future_dataframe(periods=forward, freq="D") # match freq
-        fcst = mProphet.predict(futureProphet)
+            future = prophet.make_future_dataframe(periods=forward, freq="D") # match freq
+            fcst = prophet.predict(future)
 
-        futureFcst = fcst.tail(forward + 1)
-        prophetTrend = futureFcst["yhat"].values
-        prophetTrend += curPrice - prophetTrend[0]
-        
-        upper = futureFcst["yhat_upper"].values*0 #affect the fan graph
-        lower = futureFcst["yhat_lower"].values*0
-        prophetSigma = (upper - lower) / 2.56 # 80% confidence interval width / 2.56 ~= 1 standard deviation
+            trend = fcst.tail(forward + 1)["yhat"].values
+            prophetSum.append((trend+curPrice - trend[0]) * histories.get(h))
+        prophetTrend = np.sum(prophetSum, axis=0)
 
     # IV calulcations
     if model != 1: # not model prophet
@@ -135,18 +136,16 @@ def project(ticker, model):
             return None
         else:
             smoothing = ivSmoothing(options=options, stock=stock,lastDate=lastDate,forward=forward,curPrice=curPrice,quantiles=quantiles, futureDays=futureDays)
-
-    if model == 1:
+    if model == 1: # prophet model
         if prophetTrend is None:
             raise "Prophet is NoneType"
-            
         tempSmoothing = []
         for q in quantiles:
             z = norm.ppf(q)
             line = prophetTrend + (z * prophetSigma)
             tempSmoothing.append(line)
         smoothing = np.array(tempSmoothing)
-    elif model == 2:
+    elif model == 2: # aggregate model
         if prophetTrend is None:
             pass 
         else:
